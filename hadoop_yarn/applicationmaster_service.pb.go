@@ -44,10 +44,10 @@ func (c *ApplicationMasterProtocolServiceClient) Allocate(in *AllocateRequestPro
 }
 
 func DialApplicationMasterProtocolService(conf yarn_conf.YarnConfiguration) (ApplicationMasterProtocolService, error) {
-  clientId, _ := uuid.NewV4()
-  ugi, _ := gohadoop.CreateSimpleUGIProto()
-  serverAddress, _ := conf.GetRMSchedulerAddress()
-  c := &hadoop_ipc_client.Client{ClientId: clientId, Ugi: ugi, ServerAddress: serverAddress}
+	clientId, _ := uuid.NewV4()
+	ugi, _ := gohadoop.CreateSimpleUGIProto()
+	serverAddress, _ := conf.GetRMSchedulerAddress()
+	c := &hadoop_ipc_client.Client{ClientId: clientId, Ugi: ugi, ServerAddress: serverAddress}
 	return &ApplicationMasterProtocolServiceClient{c}, nil
 }
 

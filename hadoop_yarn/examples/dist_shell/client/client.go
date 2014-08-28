@@ -67,5 +67,5 @@ func main() {
 func getEnv() []*hadoop_yarn.StringStringMapProto {
 	key := hadoop_conf.HADOOP_CONF_DIR
 	value := os.Getenv(hadoop_conf.HADOOP_CONF_DIR)
-	return []*hadoop_yarn.StringStringMapProto{&hadoop_yarn.StringStringMapProto{Key: &key, Value: &value}}
+	return []*hadoop_yarn.StringStringMapProto{{Key: &key, Value: &value}}
 }

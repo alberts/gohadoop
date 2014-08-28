@@ -9,7 +9,7 @@ import json "encoding/json"
 import math "math"
 import "github.com/hortonworks/gohadoop"
 import hadoop_common "github.com/hortonworks/gohadoop/hadoop_common"
-import hadoop_ipc_client "github.com/hortonworks/gohadoop/hadoop_common/ipc/client" 
+import hadoop_ipc_client "github.com/hortonworks/gohadoop/hadoop_common/ipc/client"
 import yarn_conf "github.com/hortonworks/gohadoop/hadoop_yarn/conf"
 import "github.com/nu7hatch/gouuid"
 
@@ -84,10 +84,10 @@ func (c *ApplicationClientProtocolServiceClient) CancelDelegationToken(in *hadoo
 
 // DialApplicationClientProtocolService connects to an ApplicationClientProtocolService at the specified network address.
 func DialApplicationClientProtocolService(conf yarn_conf.YarnConfiguration) (ApplicationClientProtocolService, error) {
-  clientId, _ := uuid.NewV4()
-  ugi, _ := gohadoop.CreateSimpleUGIProto()
-  serverAddress, _ := conf.GetRMAddress()
-  c := &hadoop_ipc_client.Client{ClientId: clientId, Ugi: ugi, ServerAddress: serverAddress}
+	clientId, _ := uuid.NewV4()
+	ugi, _ := gohadoop.CreateSimpleUGIProto()
+	serverAddress, _ := conf.GetRMAddress()
+	c := &hadoop_ipc_client.Client{ClientId: clientId, Ugi: ugi, ServerAddress: serverAddress}
 	return &ApplicationClientProtocolServiceClient{c}, nil
 }
 

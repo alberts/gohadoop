@@ -58,7 +58,7 @@ func (c *Client) Call(rpc *hadoop_common.RequestHeaderProto, rpcRequest proto.Me
 		return err
 	}
 
-	log.Printf("request: %+v", rpcRequest)
+	log.Printf("request: %T: %+v", rpcRequest, rpcRequest)
 
 	// Create call and send request
 	rpcCall := call{callId: 0, procedure: rpc, request: rpcRequest, response: rpcResponse}
@@ -71,7 +71,7 @@ func (c *Client) Call(rpc *hadoop_common.RequestHeaderProto, rpcRequest proto.Me
 	// Read & return response
 	err = c.readResponse(conn, &rpcCall)
 
-	log.Printf("response: %+v", rpcResponse)
+	log.Printf("response: %T: %+v", rpcResponse, rpcResponse)
 
 	return err
 }

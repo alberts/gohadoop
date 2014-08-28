@@ -77,6 +77,10 @@ func main() {
 	}
 	log.Printf("ApplicationAttempt in state %v", appAttemptState)
 
+	// SaslRpcClient.java
+	ipcClient := rmClient.Client
+	_ = ipcClient
+
 	// Register with ResourceManager
 	log.Println("About to register application master.")
 	err = rmClient.RegisterApplicationMaster("", -1, "")
