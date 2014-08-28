@@ -58,6 +58,8 @@ func (c *Client) Call(rpc *hadoop_common.RequestHeaderProto, rpcRequest proto.Me
 		return err
 	}
 
+	log.Printf("request: %+v", rpcRequest)
+
 	// Create call and send request
 	rpcCall := call{callId: 0, procedure: rpc, request: rpcRequest, response: rpcResponse}
 	err = sendRequest(c, conn, &rpcCall)
@@ -68,6 +70,8 @@ func (c *Client) Call(rpc *hadoop_common.RequestHeaderProto, rpcRequest proto.Me
 
 	// Read & return response
 	err = c.readResponse(conn, &rpcCall)
+
+	log.Printf("response: %+v", rpcResponse)
 
 	return err
 }
@@ -105,12 +109,13 @@ func getConnection(c *Client, connectionId *connection_id) (*connection, error) 
 
 func setupConnection(c *Client) (*connection, error) {
 	addr, _ := net.ResolveTCPAddr("tcp", c.ServerAddress)
+	log.Printf("dialing %v", addr)
 	tcpConn, err := net.DialTCP("tcp", nil, addr)
 	if err != nil {
-		log.Println("error: ", err)
+		log.Printf("error: %v", err)
 		return nil, err
 	} else {
-		log.Println("Successfully connected ", c)
+		log.Printf("Successfully connected %v", c)
 	}
 
 	// TODO: Ping thread
@@ -304,6 +309,8 @@ func (c *Client) readResponse(conn *connection, rpcCall *call) error {
 		return err
 	}
 
+	log.Printf("totalLength=%d", totalLength)
+
 	var responseBytes []byte = make([]byte, totalLength)
 	if _, err := conn.con.Read(responseBytes); err != nil {
 		log.Fatal("conn.con.Read(totalLengthBytes)", err)
@@ -317,7 +324,7 @@ func (c *Client) readResponse(conn *connection, rpcCall *call) error {
 		log.Fatal("readDelimited(responseBytes, rpcResponseHeaderProto)", err)
 		return err
 	}
-	//log.Println("Received rpcResponseHeaderProto = ", rpcResponseHeaderProto)
+	log.Printf("Received rpcResponseHeaderProto = %+v", rpcResponseHeaderProto)
 
 	err = c.checkRpcHeader(&rpcResponseHeaderProto)
 	if err != nil {
@@ -363,7 +370,8 @@ func readDelimited(rawData []byte, msg proto.Message) (int, error) {
 func (c *Client) checkRpcHeader(rpcResponseHeaderProto *hadoop_common.RpcResponseHeaderProto) error {
 	var callClientId [16]byte = [16]byte(*c.ClientId)
 	var headerClientId []byte = []byte(rpcResponseHeaderProto.ClientId)
-	if rpcResponseHeaderProto.ClientId != nil {
+	if len(rpcResponseHeaderProto.ClientId) > 0 {
+		log.Printf("len(headerClientId)=%d", len(headerClientId))
 		if !bytes.Equal(callClientId[0:16], headerClientId[0:16]) {
 			log.Fatal("Incorrect clientId: ", headerClientId)
 			return errors.New("Incorrect clientId")
