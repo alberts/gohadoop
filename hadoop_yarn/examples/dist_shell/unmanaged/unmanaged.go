@@ -12,13 +12,22 @@ func main() {
 	var err error
 
 	// Create YarnConfiguration
-	conf, _ := conf.NewYarnConfiguration()
+	conf, err := conf.NewYarnConfiguration()
+	if err != nil {
+		panic(err)
+	}
 
 	// Create YarnClient
-	yarnClient, _ := yarn_client.CreateYarnClient(conf)
+	yarnClient, err := yarn_client.CreateYarnClient(conf)
+	if err != nil {
+		panic(err)
+	}
 
 	// Create new application to get ApplicationSubmissionContext
-	_, asc, _ := yarnClient.CreateNewApplication()
+	_, asc, err := yarnClient.CreateNewApplication()
+	if err != nil {
+		panic(err)
+	}
 
 	// Some useful information
 	queue := "default"
