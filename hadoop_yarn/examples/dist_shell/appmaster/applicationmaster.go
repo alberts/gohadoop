@@ -11,7 +11,13 @@ import (
 	"time"
 )
 
+// CONTAINER_ID=container_1409185907318_0021_01_000001
+
 func parseAppAttemptId() (*hadoop_yarn.ApplicationAttemptIdProto, error) {
+	for _, e := range os.Environ() {
+		log.Println(e)
+	}
+
 	appAttemptIdString := os.Getenv("APPLICATION_ATTEMPT_ID")
 	log.Println("APPLICATION_ATTEMPT_ID: ", appAttemptIdString)
 
@@ -51,7 +57,7 @@ func main() {
 
 	// Create AMRMClient
 	rmClient, _ := yarn_client.CreateAMRMClient(conf, applicationAttemptId)
-	log.Println("Created RM client: ", rmClient)
+	log.Printf("Created RM client: %v", rmClient)
 
 	// Register with ResourceManager
 	log.Println("About to register application master.")
