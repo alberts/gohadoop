@@ -77,10 +77,6 @@ func main() {
 	}
 	log.Printf("ApplicationAttempt in state %v", appAttemptState)
 
-	// SaslRpcClient.java
-	ipcClient := rmClient.Client
-	_ = ipcClient
-
 	// Register with ResourceManager
 	log.Println("About to register application master.")
 	err = rmClient.RegisterApplicationMaster("", -1, "")
@@ -171,40 +167,3 @@ func main() {
 	}
 	log.Println("Successfully unregistered application master.")
 }
-
-/*
-
-  <name>hadoop.rpc.protection</name>
-  <value>authentication</value>
-  <description>A comma-separated list of protection values for secured sasl
-      connections. Possible values are authentication, integrity and privacy.
-      authentication means authentication only and no integrity or privacy;
-      integrity implies authentication and integrity are enabled; and privacy
-      implies all of authentication, integrity and privacy are enabled.
-      hadoop.security.saslproperties.resolver.class can be used to override
-      the hadoop.rpc.protection for a connection at the server side.
-
-*/
-
-/*
-Two types of protocols support Kerberos authentication: RPC and HTTP. The RPC protocol uses SASL GSSAPI while the HTTP protocol uses SPNego.
-*/
-
-/*
-org.apache.hadoop.ipc.RPC
-Server IPC version 9
-*/
-
-/*
-2014-08-27 20:31:09,521 INFO org.apache.hadoop.ipc.Server: Socket Reader #1 for port 8030: readAndProcess from client 10.36.10.7 threw exception [org.apache.hadoop.security.AccessControlException: SIMPLE authentication is not enabled.  Available:[TOKEN]]
-org.apache.hadoop.security.AccessControlException: SIMPLE authentication is not enabled.  Available:[TOKEN]
-	at org.apache.hadoop.ipc.Server$Connection.initializeAuthContext(Server.java:1542)
-	at org.apache.hadoop.ipc.Server$Connection.readAndProcess(Server.java:1498)
-	at org.apache.hadoop.ipc.Server$Listener.doRead(Server.java:750)
-	at org.apache.hadoop.ipc.Server$Listener$Reader.doRunLoop(Server.java:624)
-	at org.apache.hadoop.ipc.Server$Listener$Reader.run(Server.java:595)
-*/
-
-/*
-2014-08-27 20:35:43,711 WARN org.apache.hadoop.yarn.server.resourcemanager.rmapp.RMAppImpl: The specific max attempts: 0 for application: 3 is invalid, because it is out of the range [1, 2]. Use the global max attempts instead.
-*/
