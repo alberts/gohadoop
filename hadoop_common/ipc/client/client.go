@@ -10,7 +10,7 @@ import (
 	"github.com/nu7hatch/gouuid"
 	"log"
 	"net"
-	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -108,13 +108,13 @@ func getConnection(c *Client, connectionId *connection_id) (*connection, error) 
 		}
 
 		log.Printf("SETTING UP")
-
-		err = setupSaslConnection(c, con, connectionId)
-		if err != nil {
-			// TODO what happens to the con?
-			return nil, err
+		if false {
+			err = setupSaslConnection(c, con, connectionId)
+			if err != nil {
+				// TODO what happens to the con?
+				return nil, err
+			}
 		}
-
 		log.Printf("SETTING UP DONE")
 
 		err = writeConnectionContext(c, con, connectionId)
@@ -169,7 +169,8 @@ func writeConnectionHeader(conn *connection) error {
 	}
 
 	// AuthProtocol
-	if authProtocol, err := gohadoop.ConvertFixedToBytes(gohadoop.AUTH_PROTOCOL_SASL); err != nil {
+	//if authProtocol, err := gohadoop.ConvertFixedToBytes(gohadoop.AUTH_PROTOCOL_SASL); err != nil {
+	if authProtocol, err := gohadoop.ConvertFixedToBytes(gohadoop.AUTH_PROTOCOL_NONE); err != nil {
 		log.Fatal("WTF AUTH_PROTOCOL_NONE", err)
 		return err
 	} else if _, err := conn.con.Write(authProtocol); err != nil {
@@ -180,8 +181,6 @@ func writeConnectionHeader(conn *connection) error {
 	return nil
 }
 
-// realm=\"default\",nonce=\"VpkdRl6/YsgqZfaejtJDM/oUhD7PrlUjCTkAA0kB\",qop=\"auth\",charset=utf-8,algorithm=md5-sess
-
 // https://github.com/youtube/vitess/tree/master/go/rpcwrap/auth
 
 // list parser:
@@ -190,50 +189,64 @@ func writeConnectionHeader(conn *connection) error {
 // ParseList parses a comma separated list of values. Commas are ignored in
 // quoted strings. Quoted values are not unescaped or unquoted. Whitespace is
 // trimmed.
-func ParseList(header http.Header, key string) []string {
-	var result []string
-	for _, s := range header[http.CanonicalHeaderKey(key)] {
-		begin := 0
-		end := 0
-		escape := false
-		quote := false
-		for i := 0; i < len(s); i++ {
-			b := s[i]
-			switch {
-			case escape:
-				escape = false
-				end = i + 1
-			case quote:
-				switch b {
-				case '\\':
-					escape = true
-				case '"':
-					quote = false
-				}
-				end = i + 1
-			case b == '"':
-				quote = true
-				end = i + 1
-			case octetTypes[b]&isSpace != 0:
-				if begin == end {
-					begin = i + 1
-					end = begin
-				}
-			case b == ',':
-				if begin < end {
-					result = append(result, s[begin:end])
-				}
+func ParseList(s string) map[string]string {
+	var kvs []string
+
+	begin := 0
+	end := 0
+	escape := false
+	quote := false
+	for i := 0; i < len(s); i++ {
+		b := s[i]
+		switch {
+		case escape:
+			escape = false
+			end = i + 1
+		case quote:
+			switch b {
+			case '\\':
+				escape = true
+			case '"':
+				quote = false
+			}
+			end = i + 1
+		case b == '"':
+			quote = true
+			end = i + 1
+		case octetTypes[b]&isSpace != 0:
+			if begin == end {
 				begin = i + 1
 				end = begin
-			default:
-				end = i + 1
 			}
-		}
-		if begin < end {
-			result = append(result, s[begin:end])
+		case b == ',':
+			if begin < end {
+				kvs = append(kvs, s[begin:end])
+			}
+			begin = i + 1
+			end = begin
+		default:
+			end = i + 1
 		}
 	}
-	return result
+	if begin < end {
+		kvs = append(kvs, s[begin:end])
+	}
+
+	results := make(map[string]string, len(kvs))
+
+	for _, kv := range kvs {
+		parts := strings.SplitN(kv, "=", 2)
+		k := parts[0]
+		if len(parts) == 1 {
+			results[k] = ""
+			continue
+		}
+		results[k] = parts[1]
+	}
+
+	log.Printf("results: %v", results)
+
+	return results
 }
 
 // Octet types from RFC 2616.
@@ -316,7 +329,27 @@ func setupSaslConnection(c *Client, conn *connection, connectionId *connection_i
 	panic("splat")
 }
 
-func evaluateChallenge(b []byte) {
+// realm=\"default\",nonce=\"VpkdRl6/YsgqZfaejtJDM/oUhD7PrlUjCTkAA0kB\",qop=\"auth\",charset=utf-8,algorithm=md5-sess
+
+func evaluateChallenge(challenge []byte) {
+	parsed := ParseList(string(challenge))
+	cleaned := make(map[string]string, len(parsed))
+	for k, v := range parsed {
+		w, err := strconv.Unquote(v)
+		if err != nil {
+			w = v
+		}
+		cleaned[strings.ToLower(k)] = w
+	}
+
+	if strings.ToLower(cleaned["algorithm"]) != "md5-sess" {
+		panic("splat")
+	}
+	nonce := cleaned["nonce"]
+	if len(nonce) == 0 {
+		panic("splat")
+	}
+
 	panic("not implemented")
 }
 
