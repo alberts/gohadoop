@@ -2,6 +2,7 @@ package conf
 
 import (
 	hadoop_conf "github.com/hortonworks/gohadoop/hadoop_common/conf"
+	"log"
 )
 
 const (
@@ -39,11 +40,15 @@ func (yarn_conf *yarn_configuration) GetInt(key string, defaultValue int) (int, 
 }
 
 func (yarn_conf *yarn_configuration) GetRMAddress() (string, error) {
-	return yarn_conf.conf.Get(RM_ADDRESS, DEFAULT_RM_ADDRESS)
+	s, err := yarn_conf.conf.Get(RM_ADDRESS, DEFAULT_RM_ADDRESS)
+	log.Printf("RMAddress: %v", s)
+	return s, err
 }
 
 func (yarn_conf *yarn_configuration) GetRMSchedulerAddress() (string, error) {
-	return yarn_conf.conf.Get(RM_SCHEDULER_ADDRESS, DEFAULT_RM_SCHEDULER_ADDRESS)
+	s, err := yarn_conf.conf.Get(RM_SCHEDULER_ADDRESS, DEFAULT_RM_SCHEDULER_ADDRESS)
+	log.Printf("RMSchedulerAddress: %v", s)
+	return s, err
 }
 
 func (yarn_conf *yarn_configuration) Set(key string, value string) error {

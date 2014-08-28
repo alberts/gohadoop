@@ -58,6 +58,7 @@ func (c *Client) Call(rpc *hadoop_common.RequestHeaderProto, rpcRequest proto.Me
 	if err != nil {
 		return err
 	}
+	// TODO return connection to pool?
 
 	log.Printf("request: %T: %+v", rpcRequest, rpcRequest)
 
@@ -91,6 +92,8 @@ func getConnection(c *Client, connectionId *connection_id) (*connection, error) 
 	// If necessary, create a new connection and save it in the connection-pool
 	var err error
 	if con == nil {
+		log.Printf("SETTING UP NEW CONNECTION")
+
 		con, err = setupConnection(c)
 		if err != nil {
 			log.Fatal("Couldn't setup connection: ", err)

@@ -8,6 +8,19 @@ import (
 	"time"
 )
 
+/*
+
+2014/08/28 18:45:50 Successfully connected <clientId:ee71c86d-f50a-4052-53c0-14e700bd9c15, server:36citusm1.in.cfops.it:8032>
+2014/08/28 18:44:06 Received rpcResponseHeaderProto = {CallId:0xc2080871a0 Status:SUCCESS ServerIpcVersionNum:0xc2080871a8 ExceptionClassName:<nil> ErrorMsg:<nil> ErrorDetail:<nil> ClientId:[111 140 57 186 25 245 69 157 88 133 44 28 18 95 114 104] RetryCount:0xc2080871ac XXX_unrecognized:[]}
+
+2014/08/28 18:44:07 Successfully connected <clientId:fa10c6ae-84fd-4417-6816-4c1ee3594ba3, server:36citusm1.in.cfops.it:8030>
+2014/08/28 18:44:07 rmClient.RegisterApplicationMaster org.apache.hadoop.security.AccessControlException:SIMPLE authentication is not enabled.  Available:[TOKEN]:FATAL_UNAUTHORIZED:ServerDidNotSetErrorDetail
+
+https://github.com/apache/hadoop-common/commit/68467a22
+https://issues.apache.org/jira/browse/YARN-961
+
+*/
+
 func main() {
 	var err error
 
